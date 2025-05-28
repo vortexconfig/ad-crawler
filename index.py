@@ -23,10 +23,29 @@ keywords = [
 
 keyword_regex = re.compile(r'\b(?:' + '|'.join(re.escape(k) for k in keywords) + r')\b', re.IGNORECASE)
 
+# Add blacklist keywords
+blacklist_keywords = [
+    "Work from home",
+    "Call today",
+    "SiS4",
+    "Earn",
+    "Female",
+    "Commission",
+    "Feedback",
+    "Clinical",
+    "Research",
+    "Study",
+    "Survey",
+    "Interview",
+    "Focus Group",
+    "Tester"
+]
+
+# Create blacklist regex pattern
+blacklist_regex = re.compile(r'\b(?:' + '|'.join(re.escape(k) for k in blacklist_keywords) + r')\b', re.IGNORECASE)
+
 cities = [
-    "https://orlando.craigslist.org",
-    # "https://losangeles.craigslist.org",
-    # "https://chicago.craigslist.org"
+  "https://jacksonville.craigslist.org",
 ]
 
 # === Selenium setup ===
@@ -47,7 +66,7 @@ def classify_location(text):
     return "unspecified"
 
 def crawl_city(city_url):
-    results = []
+    results = {}
     gigs_url = f"{city_url}/search/cpg?search_radius=1000&search_distance=1000"
 
     print(f"Visiting {gigs_url}")
@@ -57,6 +76,8 @@ def crawl_city(city_url):
 
     # Updated selector for listings
     listings = soup.select(".result-info")
+
+    print(f"Found {len(listings)} listings in {city_url}")
 
     for listing in listings:
         a_tag = listing.select_one("a.posting-title")
@@ -69,6 +90,11 @@ def crawl_city(city_url):
         url = a_tag["href"]
         date = time_el["title"]
 
+        # Skip if title contains blacklisted keywords
+        if blacklist_regex.search(title):
+            print(f"Skipping {title}")
+            continue
+
         try:
             driver.get(url)
             time.sleep(2)
@@ -76,24 +102,28 @@ def crawl_city(city_url):
             body = post_soup.select_one("#postingbody")
             if body and keyword_regex.search(body.text):
                 location_type = classify_location(body.text)
-                results.append({
+                results[title] = {
                     "title": title,
                     "url": url,
                     "datetime": date,
                     "location_type": location_type
-                })
+                }
         except Exception as e:
             print(f"Failed to parse {url}: {e}")
 
+        print(f"Finished processing listing {title}")
+
+        # Wait for 2 seconds to prevent bot from being blocked
         time.sleep(2)
 
     return results
 
 # === Run ===
 
-all_results = []
+all_results = {}
 for city in cities:
-    all_results.extend(crawl_city(city))
+    city_results = crawl_city(city)
+    all_results.update(city_results)
     time.sleep(5)
 
 with open("craigslist_gigs_results.json", "w") as f:
