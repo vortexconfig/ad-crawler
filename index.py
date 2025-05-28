@@ -91,7 +91,7 @@ def crawl_city(city_url):
 
     print(f"Found {len(listings)} listings in {city_url}")
 
-    for listing in listings:
+    for i, listing in enumerate(listings, 1):
         a_tag = listing.select_one("a.posting-title")
         time_el = listing.select_one("div.meta").select_one("span")
 
@@ -123,7 +123,7 @@ def crawl_city(city_url):
         except Exception as e:
             print(f"Failed to parse {url}: {e}")
 
-        print(f"Finished processing listing {title}")
+        print(f"({i}/{len(listings)}) Finished processing listing {title}")
 
         # Wait for 2 seconds to prevent bot from being blocked
         time.sleep(2)
