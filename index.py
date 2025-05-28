@@ -48,7 +48,7 @@ def classify_location(text):
 
 def crawl_city(city_url):
     results = []
-    gigs_url = f"{city_url}/search/cpg"
+    gigs_url = f"{city_url}/search/cpg?search_radius=1000"
 
     print(f"Visiting {gigs_url}")
     driver.get(gigs_url)
