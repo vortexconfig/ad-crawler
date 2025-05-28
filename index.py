@@ -38,7 +38,19 @@ blacklist_keywords = [
     "Survey",
     "Interview",
     "Focus Group",
-    "Tester"
+    "Tester",
+    "earn",
+    "evaluate",
+    "evaluator",
+    "join",
+    "reviewer",
+    "mystery",
+    "promotion",
+    "coordinator",
+    "focus",
+    "jury",
+    "fiasco",
+    "reddit",
 ]
 
 # Create blacklist regex pattern
