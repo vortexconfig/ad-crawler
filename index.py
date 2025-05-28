@@ -24,7 +24,7 @@ keywords = [
 keyword_regex = re.compile(r'\b(?:' + '|'.join(re.escape(k) for k in keywords) + r')\b', re.IGNORECASE)
 
 cities = [
-    "https://orlando.craigslist.org",
+    "https://jacksonville.craigslist.org",
     # "https://losangeles.craigslist.org",
     # "https://chicago.craigslist.org"
 ]
